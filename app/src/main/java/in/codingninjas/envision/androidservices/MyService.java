@@ -6,6 +6,7 @@ import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Intent;
 import android.media.MediaPlayer;
+import android.os.Binder;
 import android.os.IBinder;
 import android.provider.Settings;
 import android.support.v4.app.NotificationCompat;
@@ -21,13 +22,13 @@ public class MyService extends Service {
     @Override
     public IBinder onBind(Intent intent) {
         // TODO: Return the communication channel to the service.
-        throw new UnsupportedOperationException("Not yet implemented");
+        return new MyBinder();
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.d("MyService","Service started");
-        player = MediaPlayer.create(this, Settings.System.DEFAULT_RINGTONE_URI);
+
         player.start();
 
         NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
@@ -49,8 +50,18 @@ public class MyService extends Service {
 
     }
 
+
+    public void startPlayer(){
+        player.start();
+    }
+
+    public void stopPlayer(){
+        player.pause();
+    }
+
     @Override
     public void onCreate() {
+        player = MediaPlayer.create(this, Settings.System.DEFAULT_RINGTONE_URI);
         super.onCreate();
     }
 
@@ -60,5 +71,13 @@ public class MyService extends Service {
         player.stop();
         player.release();
         super.onDestroy();
+    }
+
+    public class MyBinder extends  Binder {
+
+        public MyService getService(){
+            return MyService.this;
+        }
+
     }
 }
